@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>やることチェッカー（ぽよ）</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <!-- 保護者モード＋全画面ボタン -->
+  <div class="guardian-bar">
+    <button id="fullscreen-btn" class="fullscreen-btn" type="button" aria-pressed="false">
+      <span class="header-btn-icon" aria-hidden="true"></span>
+      <span class="header-btn-label">全画面</span>
+    </button>
+
+    <button id="guardian-toggle-btn" type="button" class="guardian-toggle-btn" aria-pressed="false">
+      <span class="header-btn-icon" aria-hidden="true"></span>
+      <span class="header-btn-label">保護者モード</span>
+    </button>
+  </div>
+
+  <div class="app">
+
+    <!-- 左：ぽよ＋時計＋メッセージ -->
+    <div class="left-panel">
+      <div class="clock-block">
+        <div id="clock" class="clock-time">--:--</div>
+        <div id="date" class="clock-date">----</div>
+      </div>
+
+      <div class="poyo-area">
+        <div class="poyo" id="poyo">
+          <!-- リボン（ぽよの中、真ん中上） -->
+          <img src="asset/ribbon.svg" alt="リボン" class="poyo-ribbon" id="poyo-ribbon">
+
+          <div class="poyo-face">
+            <div class="poyo-eyes">
+              <span class="poyo-eye"></span>
+              <span class="poyo-eye"></span>
+            </div>
+            <div class="poyo-mouth">
+              <span class="poyo-mouth-dot"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- メッセージ＋設定ボタンのグループ -->
+        <div class="poyo-message-group">
+          <button
+            id="accessory-toggle-btn"
+            class="poyo-accessory-toggle-btn"
+            type="button"
+            aria-pressed="true"
+            aria-label="アクセサリーの表示切り替え"
+          >
+            <span class="poyo-accessory-icon" aria-hidden="true"></span>
+          </button>
+
+          <div id="poyo-message" class="poyo-message">
+            おはよう。いっしょにやってみよ。
+          </div>
+        </div>
+
+        <!-- アクセサリー選択 -->
+        <div class="accessory-bar">
+          <div class="accessory-label">アクセサリー</div>
+          <select id="accessory-select">
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：タブ＋やることリスト -->
+    <div class="right-panel">
+
+      <!-- タブ -->
+      <div class="tabs">
+        <!-- タブ名は JS で上書きされます -->
+        <button class="tab-button active" data-tab="0">朝の準備</button>
+        <button class="tab-button" data-tab="1">帰ってから</button>
+        <button class="tab-button" data-tab="2">寝る前</button>
+      </div>
+
+      <!-- 保護者モード専用：編集エリア -->
+      <div id="guardian-editor" class="guardian-editor" aria-hidden="true">
+        <div class="guardian-section">
+          <label for="guardian-tab-name" class="guardian-field-label">
+            このタブの名前
+          </label>
+          <input
+            id="guardian-tab-name"
+            class="guardian-tab-input"
+            type="text"
+            inputmode="text"
+          >
+        </div>
+
+        <div class="guardian-section">
+          <div class="guardian-field-label">このタブのやること</div>
+          <div id="guardian-task-editor-list" class="guardian-task-editor-list"></div>
+          <button
+            id="guardian-add-task"
+            type="button"
+            class="guardian-add-task-button"
+          >
+            ＋ タスクを追加
+          </button>
+        </div>
+
+        <div class="guardian-save-row">
+          <button id="guardian-save" type="button" class="guardian-save-button">
+            保存して反映する
+          </button>
+        </div>
+      </div>
+
+      <!-- こども側に見えるチェックリスト -->
+      <div id="task-list" class="task-list">
+        <!-- JSでタスクが入る -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- はなまる（タブ完了で表示） -->
+  <div id="hanamaru-overlay" class="hanamaru-overlay" aria-hidden="true">
+    <img src="hanamaru.png" alt="はなまる">
+  </div>
+
+  <!-- 保護者モード用 かけ算クイズ -->
+  <div id="guardian-quiz-overlay" class="guardian-quiz-overlay" aria-hidden="true">
+    <div class="guardian-quiz-dialog">
+      <div class="guardian-quiz-title">保護者モードの合言葉</div>
+      <p class="guardian-quiz-text">
+        かんたんな掛け算に答えてください。
+      </p>
+      <div class="guardian-quiz-question">
+        <span id="guardian-quiz-a">2</span>
+        <span>×</span>
+        <span id="guardian-quiz-b">3</span>
+        <span>=</span>
+        <input
+          id="guardian-quiz-answer"
+          type="number"
+          inputmode="numeric"
+          class="guardian-quiz-answer"
+        >
+      </div>
+      <p id="guardian-quiz-error" class="guardian-quiz-error" aria-live="polite"></p>
+      <div class="guardian-quiz-actions">
+        <button type="button" id="guardian-quiz-cancel" class="guardian-quiz-btn ghost">
+          やめる
+        </button>
+        <button type="button" id="guardian-quiz-ok" class="guardian-quiz-btn primary">
+          これでOK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

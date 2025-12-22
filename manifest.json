@@ -1,0 +1,22 @@
+{
+  "name": "やることチェッカー（ぽよ）",
+  "short_name": "ぽよチェック",
+  "description": "毎日のやることを、ぽよといっしょに確認できるチェックリストです。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3efe8",
+  "theme_color": "#f3efe8",
+  "icons": [
+    {
+      "src": "asset/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "asset/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

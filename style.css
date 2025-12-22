@@ -1,0 +1,845 @@
+/* ==============================
+   やることチェッカー（ぽよ）
+   レイアウト再設計（崩れない版）
+   ============================== */
+
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #f3efe8;
+  --text: #3e352c;
+  --muted: #6b5f53;
+  --card: #ffffff;
+  --chip: #e2d6c4;
+  --chip-active: #c9b59c;
+  --task-bg: #f6f2ea;
+
+  /* 端末に合わせて自然に縮む */
+  --poyo-size: clamp(150px, 32vw, 230px);
+  --app-pad: 24px;
+  --app-gap: 24px;
+}
+
+html,
+body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans JP", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden; /* ページ全体はスクロールさせない */
+}
+
+/* ====== 全体レイアウト ====== */
+.app {
+  height: 100vh;
+  padding: var(--app-pad);
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--app-gap);
+  align-items: stretch;
+}
+
+/* ====== 左（時計+ぽよ+メッセージ） ====== */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-height: 0;
+}
+
+.clock-block {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.clock-time {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.clock-date {
+  margin-top: 4px;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+/* ぽよとメッセージは「通常フロー」に乗せる（重なり防止） */
+.poyo-area {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ぽよ本体 */
+.poyo {
+  width: var(--poyo-size);
+  height: var(--poyo-size);
+  border-radius: 50%;
+  background: #f5ecde;
+  border: 3px solid #e0d4c4;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: poyoFloat 1.8s ease-in-out infinite;
+  position: relative;
+}
+
+.poyo-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 目 */
+.poyo-eyes {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+}
+
+.poyo-eye {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a2f2a;
+  position: relative;
+  transform-origin: center;
+  animation: blink 4s infinite;
+  transition: background 0.15s ease;
+}
+
+.poyo-eye::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-top: 3px solid #3a2f2a;
+  border-radius: 50%;
+  transform: translateY(2px);
+  transition: opacity 0.15s ease;
+}
+
+.poyo-eye.smiling {
+  background: transparent;
+  animation: none;
+}
+
+.poyo-eye.smiling::before { opacity: 1; }
+
+/* 口 */
+.poyo-mouth {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poyo-mouth-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: hsl(19, 16%, 20%);
+  transform-origin: center;
+  transform: scale(1.1, 0.3);
+}
+
+.poyo-speaking .poyo-mouth-dot {
+  animation: mouthTalk 0.5s ease-in-out 0s 2;
+}
+
+.poyo-mouth-open .poyo-mouth-dot {
+  transform: scale(1, 1);
+  animation: none;
+}
+
+/* ぽよのリボン */
+.poyo-ribbon {
+  position: absolute;
+  bottom: calc(100% - 36px); /* ここで“画像の下”の高さを調整 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  max-width: 70%;
+  pointer-events: none;
+}
+
+/* メッセージ */
+.poyo-message {
+  z-index: 2;
+  min-height: 2.5em;
+  font-size: 1rem;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  width: min(320px, 100%);
+}
+
+/* メッセージ＋設定ボタンのまとまり */
+.poyo-message-group {
+  width: min(320px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+/* メッセージはグループ内で幅いっぱい */
+.poyo-message {
+  width: 100%;
+}
+
+/* アクセサリー表示切り替えボタン：メッセージの左上に並べる */
+.poyo-accessory-toggle-btn {
+  border-radius: 999px;
+  border: 1px solid #d6c7b7;
+  background: #f7efe5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+  align-self: flex-start;
+  position: static;
+}
+
+.poyo-accessory-toggle-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* 設定アイコン */
+.poyo-accessory-icon {
+  width: 18px;
+  height: 18px;
+  background: url("asset/setting.svg") center/contain no-repeat;
+}
+
+/* アクセサリーバー非表示用 */
+.accessory-bar.is-hidden {
+  display: none;
+}
+
+/* アクセサリー選択（メッセージのすぐ下・横並び） */
+.accessory-bar {
+  margin-top: 4px;
+  width: min(320px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+}
+
+.accessory-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.accessory-select,
+.accessory-bar select {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #d0c0af;
+  font-size: 0.9rem;
+  background: #ffffff;
+}
+
+/* ====== 右（タブ+リスト） ====== */
+.right-panel {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* タブ */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.tab-button {
+  flex: 1;
+  border-radius: 999px;
+  border: none;
+  padding: 10px 8px;
+  font-size: 0.95rem;
+  background: var(--chip);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background: var(--chip-active);
+  font-weight: 600;
+}
+
+/* リスト：右パネル内だけスクロール */
+.task-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+/* 個別タスク */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--task-bg);
+}
+
+/* チェックボックス */
+.task-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #d8cec0;
+  background: #ffffff;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.task-item input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 4px;
+  background: #f2c9a8;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.15s ease-out;
+}
+
+.task-item input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: translate(4px, 5px) rotate(-45deg) scale(0);
+  transform-origin: center;
+  transition: transform 0.12s ease-out;
+}
+
+.task-item input[type="checkbox"]:checked {
+  border-color: #f0b08f;
+  background: #fbe5d6;
+  box-shadow: 0 0 0 2px rgba(240, 176, 143, 0.25);
+}
+
+.task-item input[type="checkbox"]:checked::before { transform: scale(1); }
+
+.task-item input[type="checkbox"]:checked::after {
+  transform: translate(4px, 5px) rotate(-45deg) scale(1);
+}
+
+.task-item input[type="checkbox"]:hover { transform: translateY(-1px); }
+
+.task-item input[type="checkbox"]:focus-visible {
+  outline: 2px solid #f0b08f;
+  outline-offset: 2px;
+}
+
+.task-text { font-size: 1.1rem; }
+
+.task-item.completed .task-text {
+  text-decoration: line-through;
+  color: #9a9085;
+}
+
+/* ====== アニメーション ====== */
+@keyframes mouthTalk {
+  0%   { transform: scale(1.1, 0.3); }
+  30%  { transform: scale(1.1, 1.3); }
+  60%  { transform: scale(0.7, 0.7); }
+  100% { transform: scale(1.1, 0.3); }
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%          { transform: scaleY(0.1); }
+}
+
+@keyframes poyoFloat {
+  0%   { transform: translateY(0) scale(1, 1); }
+  25%  { transform: translateY(-6px) scale(1.03, 0.97); }
+  50%  { transform: translateY(0) scale(0.98, 1.03); }
+  75%  { transform: translateY(-3px) scale(1.02, 0.98); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+.poyo-tap { animation: poyoTap 0.6s cubic-bezier(0.25, 1.3, 0.4, 1) 1; }
+
+@keyframes poyoTap {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-14px) scale(1.22, 0.9); }
+  50%  { transform: translateY(8px) scale(0.9, 1.18); }
+  80%  { transform: translateY(-3px) scale(1.06, 0.97); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+.poyo-happy {
+  animation: poyoHappy 0.6s ease-out 1, poyoFloat 1.8s ease-in-out infinite 0.6s;
+}
+
+@keyframes poyoHappy {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* =========================
+   はなまる（タブ完了）
+   ========================= */
+.hanamaru-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+}
+
+.hanamaru-overlay.is-visible {
+  display: flex;
+}
+
+.hanamaru-overlay img {
+  width: min(60vw, 320px);
+  height: auto;
+  transform: scale(0.9);
+  animation: hanamaru-pop 260ms ease-out forwards;
+}
+
+@keyframes hanamaru-pop {
+  from { transform: scale(0.85); opacity: 0.0; }
+  to   { transform: scale(1);    opacity: 1.0; }
+}
+
+/* =========================
+   保護者モード
+   ========================= */
+
+.guardian-editor {
+  display: none;
+  padding: 8px 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: #f5eee5;
+  border: 1px solid #eadaca;
+}
+
+body.guardian-mode .guardian-editor {
+  display: block;
+}
+
+.guardian-section + .guardian-section {
+  margin-top: 10px;
+}
+
+.guardian-field-label {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: var(--muted);
+}
+
+.guardian-tab-input,
+.guardian-task-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #d0c0af;
+  font-size: 0.9rem;
+  background: #ffffff;
+}
+
+.guardian-task-editor-list {
+  margin-top: 4px;
+}
+
+.guardian-task-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.guardian-task-delete {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: none;
+  background: #e5c3ad;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.guardian-task-delete:hover {
+  filter: brightness(0.96);
+}
+
+.guardian-add-task-button {
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #d5e7c9;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.guardian-add-task-button:hover {
+  filter: brightness(0.97);
+}
+
+.guardian-save-row {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.guardian-save-button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.85rem;
+  background: #eb7f3b;
+  color: #fff;
+  cursor: pointer;
+}
+
+.guardian-save-button:hover {
+  filter: brightness(0.97);
+}
+
+/* =========================
+   保護者モード かけ算クイズ
+   ========================= */
+.guardian-quiz-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+}
+
+.guardian-quiz-overlay.is-visible {
+  display: flex;
+}
+
+.guardian-quiz-dialog {
+  width: min(90vw, 360px);
+  padding: 16px 18px 14px;
+  border-radius: 16px;
+  background: #fff7ec;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: 1px solid #f0d8b8;
+}
+
+.guardian-quiz-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #5b4230;
+}
+
+.guardian-quiz-text {
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  color: #7a624e;
+}
+
+.guardian-quiz-question {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.guardian-quiz-answer {
+  width: 80px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid #d0c0af;
+  font-size: 0.95rem;
+  text-align: center;
+  background: #ffffff;
+}
+
+.guardian-quiz-error {
+  min-height: 1.1em;
+  margin: 0 2px 8px;
+  font-size: 0.8rem;
+  color: #c24646;
+}
+
+.guardian-quiz-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.guardian-quiz-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.guardian-quiz-btn.primary {
+  background: #f0b37a;
+}
+
+.guardian-quiz-btn.ghost {
+  background: #e5ddd3;
+}
+
+.guardian-quiz-btn:hover {
+  filter: brightness(0.97);
+}
+
+/* ====== レスポンシブ：縦画面（スマホ想定） ====== */
+@media (max-width: 768px) {
+  :root {
+    --app-pad: 16px;
+    --app-gap: 16px;
+    --poyo-size: clamp(150px, 52vw, 220px);
+  }
+
+  body { overflow: hidden; }
+
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .left-panel {
+    gap: 14px;
+  }
+
+  .right-panel {
+    padding: 14px 16px;
+  }
+
+  .tabs {
+    gap: 8px;
+  }
+
+  .tab-button {
+    padding: 10px 6px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ====== レスポンシブ：スマホ横（高さが短い） ====== */
+@media (orientation: landscape) and (max-height: 520px) {
+  :root {
+    --app-pad: 12px;
+    --app-gap: 12px;
+    --poyo-size: clamp(120px, 20vw, 170px);
+  }
+
+  .app {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .clock-time { font-size: 2.2rem; }
+  .clock-date { font-size: 0.95rem; }
+
+  .right-panel { padding: 12px 14px; }
+
+  .tabs { margin-bottom: 10px; }
+  .tab-button { padding: 8px 6px; font-size: 0.88rem; }
+
+  .task-text { font-size: 1rem; }
+}
+
+/* PC表示のときは、タブ＋リストが入っているボックスごと少し下げる */
+@media (min-width: 769px) {
+  .right-panel {
+    margin-top: 28px;
+  }
+}
+
+/* 保護者モード ON のときは、右パネル全体をスクロールさせる */
+body.guardian-mode .right-panel {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* その間は、タスクリスト単体ではスクロールしないようにする */
+body.guardian-mode .task-list {
+  flex: none;
+  min-height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+/* 右上：保護者モード＋全画面ボタンをまとめて配置 */
+.guardian-bar {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 9998;
+}
+
+/* 保護者モードボタン & 全画面ボタンの共通スタイル */
+.guardian-toggle-btn,
+.fullscreen-btn {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d6c7b7;
+  background: #f7efe5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    color 0.15s ease;
+}
+
+.guardian-toggle-btn:active,
+.fullscreen-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* 保護者モード ON のときだけ見た目を変える */
+body.guardian-mode .guardian-toggle-btn {
+  background: #f0b37a;
+  color: #4b3425;
+  border-color: #e09b56;
+  box-shadow: 0 2px 0 rgba(189, 129, 71, 0.7);
+}
+
+body.guardian-mode .guardian-toggle-btn::after {
+  content: " ON";
+  font-size: 0.75rem;
+}
+
+/* ボタン内アイコン */
+.header-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* ボタンのラベル（PC では表示、スマホでは隠す） */
+.header-btn-label {
+  font-size: 0.85rem;
+}
+
+/* それぞれのアイコン画像 */
+.guardian-toggle-btn .header-btn-icon {
+  background-image: url("asset/guardian.svg");
+}
+
+/* 全画面：デフォルトは「オフ」アイコン */
+.fullscreen-btn .header-btn-icon {
+  background-image: url("asset/fullscreen-off.svg");
+}
+
+/* 全画面中は「オン」アイコンに切り替え */
+body.is-fullscreen .fullscreen-btn .header-btn-icon {
+  background-image: url("asset/fullscreen-on.svg");
+}
+
+/* スマホ表示：ボタンを丸いアイコンボタンにしてラベルを非表示＋ON表示を消す */
+@media (max-width: 768px) {
+  .guardian-toggle-btn,
+  .fullscreen-btn {
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+    justify-content: center;
+    gap: 0;
+  }
+
+  .header-btn-label {
+    display: none;
+  }
+
+  body.guardian-mode .guardian-toggle-btn::after {
+    content: "";
+    display: none;
+  }
+}
+
+/* PWAとして起動しているときは全画面ボタンを消す */
+@media (display-mode: standalone) {
+  .fullscreen-btn {
+    display: none;
+  }
+}
