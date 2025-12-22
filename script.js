@@ -916,3 +916,14 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+// Service Worker の登録（対応ブラウザのみ）
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .catch((err) => {
+        console.error("Service Worker registration failed:", err);
+      });
+  });
+}
