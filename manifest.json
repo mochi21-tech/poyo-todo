@@ -1,6 +1,6 @@
 {
   "name": "やることチェッカー（ぽよ）",
-  "short_name": "ぽよチェック",
+  "short_name": "やることチェッカー",
   "description": "毎日のやることを、ぽよといっしょに確認できるチェックリストです。",
   "start_url": "./index.html",
   "display": "standalone",
