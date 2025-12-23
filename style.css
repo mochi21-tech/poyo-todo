@@ -655,6 +655,133 @@ body.guardian-mode .guardian-editor {
   filter: brightness(0.97);
 }
 
+/* =========================
+   つかいかた モーダル
+   ========================= */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+}
+
+.help-overlay.is-visible {
+  display: flex;
+}
+
+.help-dialog {
+  width: min(92vw, 420px);
+  max-height: 90vh;
+  padding: 14px 16px 12px;
+  border-radius: 16px;
+  background: #fffef9;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: 1px solid #f0e4c8;
+  display: flex;
+  flex-direction: column;
+}
+
+.help-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #5b4230;
+}
+
+.help-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  font-size: 0.85rem;
+  color: #6c5845;
+}
+
+.help-section + .help-section {
+  margin-top: 8px;
+}
+
+.help-section h2 {
+  font-size: 0.85rem;
+  margin: 0 0 2px;
+  color: #4b3a2c;
+}
+
+.help-section ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.help-section li {
+  margin-bottom: 2px;
+}
+
+.help-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.help-close-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.85rem;
+  background: #e5ddd3;
+  cursor: pointer;
+}
+
+.help-close-btn:hover {
+  filter: brightness(0.97);
+}
+
+/* 右上ボタンに help-btn を追加で適用 */
+.guardian-toggle-btn,
+.fullscreen-btn,
+.help-btn {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d6c7b7;
+  background: #f7efe5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    color 0.15s ease;
+}
+
+.guardian-toggle-btn:active,
+.fullscreen-btn:active,
+.help-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* スマホ表示のとき：helpボタンも丸アイコン化 */
+@media (max-width: 768px) {
+  .guardian-toggle-btn,
+  .fullscreen-btn,
+  .help-btn {
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    justify-content: center;
+    gap: 0;
+  }
+}
+
 /* ====== レスポンシブ：縦画面（スマホ想定） ====== */
 @media (max-width: 768px) {
   :root {

@@ -11,6 +11,10 @@
 
   <!-- 保護者モード＋全画面ボタン -->
   <div class="guardian-bar">
+    <button id="help-btn" class="help-btn" type="button">
+      <span class="header-btn-icon" aria-hidden="true">?</span>
+      <span class="header-btn-label">つかいかた</span>
+    </button>
     <button id="fullscreen-btn" class="fullscreen-btn" type="button" aria-pressed="false">
       <span class="header-btn-icon" aria-hidden="true"></span>
       <span class="header-btn-label">全画面</span>
@@ -156,6 +160,48 @@
         </button>
         <button type="button" id="guardian-quiz-ok" class="guardian-quiz-btn primary">
           これでOK
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- つかいかた モーダル -->
+  <div id="help-overlay" class="help-overlay" aria-hidden="true">
+    <div class="help-dialog">
+      <div class="help-title">つかいかた</div>
+      <div class="help-content">
+        <section class="help-section">
+          <h2>① 基本の使い方</h2>
+          <ul>
+            <li>上のタブで「朝の準備／帰ってから／寝る前」をえらびます。</li>
+            <li>やったことにチェックを入れていきます。</li>
+            <li>毎日0時ごろにチェックはリセットされます。（タスク名は残ります）</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h2>② 保護者モード</h2>
+          <ul>
+            <li>右上の「保護者モード」ボタンから、掛け算クイズに正解するとONになります。</li>
+            <li>ONのあいだは、タブ名ややることを編集できます。</li>
+            <li>「保存して反映する」を押したときだけ、こども側の画面に反映されます。</li>
+            <li>まちがえた場合は、「保護者モード」をOFFにすると編集前の状態にもどります。</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h2>③ アクセサリー</h2>
+          <ul>
+            <li>3つのタブ、ぜんぶのチェックがついた日が「がんばった日」としてカウントされます。</li>
+            <li>チェックボックスが1つもない日はカウントされません。</li>
+            <li>たまった日数に合わせて、アクセサリーが少しずつ開放されます。</li>
+            <li>アクセサリー名の「（あと◯日）」は、そのアイテムが開くまでに必要な日数です。</li>
+          </ul>
+        </section>
+      </div>
+      <div class="help-actions">
+        <button id="help-close" type="button" class="help-close-btn">
+          とじる
         </button>
       </div>
     </div>

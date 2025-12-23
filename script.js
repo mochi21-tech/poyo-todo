@@ -815,6 +815,34 @@ function setupFullscreenButton() {
   syncState();
 }
 
+// つかいかたモーダル
+function setupHelpOverlay() {
+  const helpBtn = document.getElementById("help-btn");
+  const overlay = document.getElementById("help-overlay");
+  const closeBtn = document.getElementById("help-close");
+
+  if (!helpBtn || !overlay || !closeBtn) return;
+
+  function openHelp() {
+    overlay.classList.add("is-visible");
+    overlay.setAttribute("aria-hidden", "false");
+  }
+
+  function closeHelp() {
+    overlay.classList.remove("is-visible");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  helpBtn.addEventListener("click", openHelp);
+  closeBtn.addEventListener("click", closeHelp);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      closeHelp();
+    }
+  });
+}
+
 function setupGuardianMode() {
   const btn = document.getElementById("guardian-toggle-btn");
   if (!btn) return;
@@ -907,6 +935,7 @@ function init() {
   setupPoyoTap();
 
   setupFullscreenButton();
+  setupHelpOverlay();
 
   // はなまるをタップしたら閉じる
   const overlay = document.getElementById("hanamaru-overlay");
