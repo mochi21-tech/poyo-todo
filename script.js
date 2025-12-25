@@ -248,7 +248,7 @@ function saveState() {
 function resetIfNeeded() {
   const nowKey = todayKey();
   if (state.lastResetDate === nowKey) {
-    return;
+    return false; // ← 変化なし
   }
 
   // 前の日（lastResetDate の日）の状態として、「全部チェックの日」だったか判定
@@ -264,6 +264,19 @@ function resetIfNeeded() {
   updateAccessoryOptions();
 
   saveState();
+  return true; // ← 変化あり
+}
+
+function handleDayChangeIfNeeded() {
+  const changed = resetIfNeeded();
+  if (!changed) return;
+
+  // リセット後に画面が古いままにならないように更新
+  renderTabs();
+  renderTasks();
+  syncHanamaruForActiveTab({ celebrate: false });
+  refreshPoyoMessageForActiveTab();
+  applyAccessoryFromState();
 }
 
 // 時計表示
@@ -916,6 +929,15 @@ function init() {
   refreshPoyoMessageForActiveTab();
   updateClock();
   setInterval(updateClock, 1000);
+  
+    // 開きっぱなしで0時を跨いでもリセットされるように監視
+  setInterval(handleDayChangeIfNeeded, 60 * 1000);
+
+  // スリープ復帰やタブ復帰でも拾う
+  window.addEventListener("focus", handleDayChangeIfNeeded);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) handleDayChangeIfNeeded();
+  });
 
   // タブ切り替え
   document.querySelectorAll(".tab-button").forEach((btn) => {
