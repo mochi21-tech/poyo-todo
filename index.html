@@ -30,7 +30,9 @@
 
     <!-- 左：ぽよ＋時計＋メッセージ -->
     <div class="left-panel">
-
+<div style="text-align:center;font-size:10px;color:#888;">
+  build: 2025-12-29-1
+</div>
       <!-- 平日/休日切り替えボタン -->
       <div class="template-switch-bar">
         <button id="template-weekday-btn" class="template-btn active" type="button">
@@ -184,29 +186,35 @@
         <section class="help-section">
           <h2>① 基本の使い方</h2>
           <ul>
-            <li>上のタブで「朝の準備／帰ってから／寝る前」をえらびます。</li>
-            <li>やったことにチェックを入れていきます。</li>
-            <li>毎日0時ごろにチェックはリセットされます。（タスク名は残ります）</li>
+            <li>上のタブで「朝の準備／帰ってから／寝る前」を選びます。</li>
+            <li>やったことにチェックを付けていきます。</li>
+            <li>チェックは毎日0時ごろにリセットされます。（タスク名は残ります）</li>
           </ul>
         </section>
 
         <section class="help-section">
           <h2>② 保護者モード</h2>
           <ul>
-            <li>右上の「保護者モード」ボタンから、掛け算クイズに正解するとONになります。</li>
-            <li>ONのあいだは、タブ名ややることを編集できます。</li>
-            <li>「保存して反映する」を押したときだけ、こども側の画面に反映されます。</li>
-            <li>まちがえた場合は、「保護者モード」をOFFにすると編集前の状態にもどります。</li>
+            <li>右上の「保護者モード」で掛け算クイズに正解するとONになります。</li>
+            <li>ONのあいだだけ、タブ名ややることを編集・並べ替えできます。</li>
+            <li>「保存して反映する」を押すと、こども側の画面に反映されます。</li>
           </ul>
         </section>
 
         <section class="help-section">
           <h2>③ アクセサリー</h2>
           <ul>
-            <li>3つのタブ、ぜんぶのチェックがついた日が「がんばった日」としてカウントされます。</li>
-            <li>チェックボックスが1つもない日はカウントされません。</li>
-            <li>たまった日数に合わせて、アクセサリーが少しずつ開放されます。</li>
-            <li>アクセサリー名の「（あと◯日）」は、そのアイテムが開くまでに必要な日数です。</li>
+            <li>3つのタブ全部にチェックが付いた日が「がんばった日」になります。</li>
+            <li>がんばった日がたまると、アクセサリーが少しずつ開放されます。</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h2>④ 平日／休日テンプレート</h2>
+          <ul>
+            <li>上の「平日／休日」ボタンで、使うテンプレートを切り替えできます。</li>
+            <li>土日や祝日は、自動で「休日」が選ばれます。必要なら「平日」に切り替え直せます。</li>
+            <li>保護者モード中は、選んでいるほう（平日／休日）のやることが編集対象になります。</li>
           </ul>
         </section>
       </div>
@@ -217,6 +225,7 @@
       </div>
     </div>
   </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/japanese-holidays@2.0.2/lib/index.min.js"></script>
