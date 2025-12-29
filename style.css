@@ -80,6 +80,12 @@ body {
   gap: 12px;
 }
 
+.poyo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ぽよ本体 */
 .poyo {
   width: var(--poyo-size);
@@ -842,6 +848,12 @@ body.guardian-mode .guardian-editor {
     grid-template-columns: 260px 1fr;
   }
 
+  /* ★ぽよ一式をまとめて縮小 */
+  .poyo-wrapper {
+    transform: scale(0.8);
+    transform-origin: center top;
+  }
+  
   .clock-time { font-size: 2.2rem; }
   .clock-date { font-size: 0.95rem; }
 
