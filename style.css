@@ -802,7 +802,7 @@ body.guardian-mode .guardian-editor {
   :root {
     --app-pad: 16px;
     --app-gap: 16px;
-    --poyo-size: clamp(150px, 52vw, 220px);
+    --poyo-size: min(160px, 40vh);
   }
 
   body { overflow: hidden; }
