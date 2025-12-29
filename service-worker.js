@@ -10,7 +10,6 @@ const URLS_TO_CACHE = [
   "./manifest.json",
   "./hanamaru.png",
   // ここに実際に使っている画像を追加していく
-  "./asset/ribbon.svg",
   "./asset/asset1.svg",
   "./asset/asset2.svg",
   "./asset/asset3.svg",
@@ -29,7 +28,11 @@ const URLS_TO_CACHE = [
   "./asset/asset16.svg",
   "./asset/asset17.svg",
   "./asset/icon-192.png",
-  "./asset/icon-512.png"
+  "./asset/icon-512.png",
+  "./asset/fullscreen-off.svg",
+  "./asset/fullscreen-on.svg",
+  "./asset/setting.svg",
+  "./asset/guardian.svg",
 ];
 
 // インストール時：まとめてキャッシュに入れる
