@@ -30,6 +30,17 @@
 
     <!-- 左：ぽよ＋時計＋メッセージ -->
     <div class="left-panel">
+
+      <!-- 平日/休日切り替えボタン -->
+      <div class="template-switch-bar">
+        <button id="template-weekday-btn" class="template-btn active" type="button">
+          平日
+        </button>
+        <button id="template-holiday-btn" class="template-btn" type="button">
+          休日
+        </button>
+      </div>
+
       <div class="clock-block">
         <div id="clock" class="clock-time">--:--</div>
         <div id="date" class="clock-date">----</div>
@@ -38,7 +49,7 @@
       <div class="poyo-area">
         <div class="poyo" id="poyo">
           <!-- リボン（ぽよの中、真ん中上） -->
-          <img src="asset/ribbon.svg" alt="リボン" class="poyo-ribbon" id="poyo-ribbon">
+          <img src="asset/asset16.svg" alt="リボン" class="poyo-ribbon" id="poyo-ribbon" style="display: none;">
 
           <div class="poyo-face">
             <div class="poyo-eyes">
@@ -208,6 +219,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/japanese-holidays@2.0.2/lib/index.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

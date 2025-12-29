@@ -46,7 +46,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
   min-height: 0;
 }
 
@@ -983,5 +983,49 @@ body.is-fullscreen .fullscreen-btn .header-btn-icon {
 @media (display-mode: standalone) {
   .fullscreen-btn {
     display: none;
+  }
+}
+
+/* =========================
+   平日/休日切り替えボタン
+   ========================= */
+.template-switch-bar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 6px; /* 時計とのすき間 */
+}
+
+.template-btn {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #d6c7b7;
+  background: #f7efe5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.template-btn:hover {
+  background: #f0e8dc;
+}
+
+.template-btn.active {
+  background: var(--chip-active);
+  color: var(--text);
+  font-weight: 600;
+  border-color: #b8a68f;
+}
+
+/* スマホ表示：時計の下に配置 */
+@media (max-width: 768px) {
+  .template-switch-bar {
+    margin: 0 auto 10px;
   }
 }

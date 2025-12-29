@@ -93,9 +93,25 @@ const POYO_MESSAGES_ALL_DONE = [
 const STORAGE_KEY = "poyoTodoData_v1";
 
 let state = {
-  tabs: [...INITIAL_TABS],
-  tasks: INITIAL_TASKS.map(list => [...list]),
-  checks: INITIAL_TASKS.map(list => list.map(() => false)),
+  templateMode: "weekday", // "weekday" or "holiday"
+  weekday: {
+    tabs: [...INITIAL_TABS],
+    tasks: INITIAL_TASKS.map(list => [...list]),
+    checks: INITIAL_TASKS.map(list => list.map(() => false))
+  },
+  holiday: {
+    tabs: ["ゆっくりの朝", "お昼から", "寝る前"],
+    tasks: [
+      ["朝ごはんを食べよう！", "お手伝いをしよう！", "好きなことをしよう！"],
+      ["お昼ごはんを食べよう！", "お出かけの準備をしよう！", "宿題があればやろう！"],
+      ["歯みがきをしよう！", "お風呂に入ろう！", "明日の予定を確認しよう！", "おやすみのあいさつ"]
+    ],
+    checks: [
+      [false, false, false],
+      [false, false, false],
+      [false, false, false, false]
+    ]
+  },
   lastResetDate: null,
   activeTab: 0,
   guardianMode: false,
@@ -106,12 +122,41 @@ let state = {
 
 let guardianDraft = null;
 
+// 現在のテンプレートデータを取得
+function getCurrentTemplate() {
+  return state[state.templateMode];
+}
+
+// 今日は休日かどうか判定（土日祝）
+function isTodayHoliday() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  
+  // 土日判定
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    return true;
+  }
+  
+  // 祝日判定（ライブラリが読み込まれている場合）
+  if (typeof JapaneseHolidays !== 'undefined' && JapaneseHolidays.isHoliday) {
+    return JapaneseHolidays.isHoliday(today);
+  }
+  
+  return false;
+}
+
+// 自動テンプレート判定
+function autoSwitchTemplate() {
+  state.templateMode = isTodayHoliday() ? "holiday" : "weekday";
+}
+
 // state から下書きを作る
 function resetGuardianDraftFromState() {
+  const template = getCurrentTemplate();
   guardianDraft = {
-    tabs: state.tabs.map((t) => t),
-    tasks: state.tasks.map((list) => [...list]),
-    checks: state.checks.map((list) => [...list]),
+    tabs: template.tabs.map((t) => t),
+    tasks: template.tasks.map((list) => [...list]),
+    checks: template.checks.map((list) => [...list]),
   };
 }
 
@@ -122,8 +167,9 @@ let hanamaruTimer = null;
 let lastAllDoneByTab = INITIAL_TABS.map(() => false);
 
 function isTabAllDone(tabIndex) {
-  const tasks = state.tasks[tabIndex] || [];
-  const checks = state.checks[tabIndex] || [];
+  const template = getCurrentTemplate();
+  const tasks = template.tasks[tabIndex] || [];
+  const checks = template.checks[tabIndex] || [];
   if (!tasks.length) return false;
   return tasks.every((_, i) => !!checks[i]);
 }
@@ -133,8 +179,9 @@ function isAllTasksAllDoneAcrossTabs() {
   let totalCheckboxes = 0;
   let anyUnchecked = false;
 
-  state.tasks.forEach((tasks, tabIndex) => {
-    const checks = state.checks[tabIndex] || [];
+  const template = getCurrentTemplate();
+  template.tasks.forEach((tasks, tabIndex) => {
+    const checks = template.checks[tabIndex] || [];
     tasks.forEach((_, i) => {
       totalCheckboxes++;
       if (!checks[i]) {
@@ -204,14 +251,25 @@ function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     state.lastResetDate = todayKey();
+    autoSwitchTemplate(); // 自動判定
     return;
   }
   try {
     const data = JSON.parse(raw);
-    if (data && Array.isArray(data.tabs) && Array.isArray(data.tasks) && Array.isArray(data.checks)) {
-      state.tabs = data.tabs;
-      state.tasks = data.tasks;
-      state.checks = data.checks;
+    if (data) {
+      // 新形式のデータ
+      if (data.weekday && data.holiday) {
+        state.templateMode = data.templateMode || "weekday";
+        state.weekday = data.weekday;
+        state.holiday = data.holiday;
+      }
+      // 旧形式のデータ（互換性のため）
+      else if (Array.isArray(data.tabs) && Array.isArray(data.tasks) && Array.isArray(data.checks)) {
+        state.weekday.tabs = data.tabs;
+        state.weekday.tasks = data.tasks;
+        state.weekday.checks = data.checks;
+      }
+      
       state.lastResetDate = data.lastResetDate || todayKey();
       state.activeTab = data.activeTab || 0;
       state.guardianMode = !!data.guardianMode;
@@ -223,17 +281,21 @@ function loadState() {
       state.perfectCount =
         typeof data.perfectCount === "number" ? data.perfectCount : 0;
     }
+    
+    // 起動時に自動判定
+    autoSwitchTemplate();
   } catch (e) {
     console.error(e);
     state.lastResetDate = todayKey();
+    autoSwitchTemplate();
   }
 }
 
 function saveState() {
   const data = {
-    tabs: state.tabs,
-    tasks: state.tasks,
-    checks: state.checks,
+    templateMode: state.templateMode,
+    weekday: state.weekday,
+    holiday: state.holiday,
     lastResetDate: state.lastResetDate,
     activeTab: state.activeTab,
     guardianMode: state.guardianMode,
@@ -248,7 +310,7 @@ function saveState() {
 function resetIfNeeded() {
   const nowKey = todayKey();
   if (state.lastResetDate === nowKey) {
-    return false; // ← 変化なし
+    return false;
   }
 
   // 前の日（lastResetDate の日）の状態として、「全部チェックの日」だったか判定
@@ -256,15 +318,18 @@ function resetIfNeeded() {
     state.perfectCount = (state.perfectCount || 0) + 1;
   }
 
-  // 新しい日用にチェックを全部リセット
-  state.checks = state.tasks.map(list => list.map(() => false));
+  // 平日・休日両方のチェックをリセット
+  state.weekday.checks = state.weekday.tasks.map(list => list.map(() => false));
+  state.holiday.checks = state.holiday.tasks.map(list => list.map(() => false));
   state.lastResetDate = nowKey;
 
+  // テンプレート自動判定
+  autoSwitchTemplate();
   // アクセサリーの解放状況を更新
   updateAccessoryOptions();
 
   saveState();
-  return true; // ← 変化あり
+  return true;
 }
 
 function handleDayChangeIfNeeded() {
@@ -298,9 +363,10 @@ function updateClock() {
 
 // タブ表示更新
 function renderTabs() {
+  const template = getCurrentTemplate();
   const buttons = document.querySelectorAll(".tab-button");
   buttons.forEach((btn, index) => {
-    btn.textContent = state.tabs[index] || `タブ${index + 1}`;
+    btn.textContent = template.tabs[index] || `タブ${index + 1}`;
     if (index === state.activeTab) {
       btn.classList.add("active");
     } else {
@@ -315,9 +381,10 @@ function renderTasks() {
   if (!container) return;
   container.innerHTML = "";
 
+  const template = getCurrentTemplate();
   const tabIndex = state.activeTab;
-  const tasks = state.tasks[tabIndex] || [];
-  const checks = state.checks[tabIndex] || [];
+  const tasks = template.tasks[tabIndex] || [];
+  const checks = template.checks[tabIndex] || [];
 
   tasks.forEach((text, i) => {
     const item = document.createElement("label");
@@ -336,7 +403,7 @@ function renderTasks() {
     }
 
     checkbox.addEventListener("change", () => {
-      state.checks[tabIndex][i] = checkbox.checked;
+      template.checks[tabIndex][i] = checkbox.checked;
       if (checkbox.checked) {
         item.classList.add("completed");
       } else {
@@ -542,7 +609,7 @@ function syncGuardianEditor() {
 
   editor.setAttribute("aria-hidden", "false");
 
-  // 編集元は guardianDraft （なければ state から作る）
+  // 編集元は guardianDraft （なければ getCurrentTemplate から作る）
   if (!guardianDraft) {
     resetGuardianDraftFromState();
   }
@@ -742,9 +809,10 @@ function randomFrom(list) {
 }
 
 function handleTaskChecked() {
+  const template = getCurrentTemplate();
   const tabIndex = state.activeTab;
-  const tasks = state.tasks[tabIndex] || [];
-  const checks = state.checks[tabIndex] || [];
+  const tasks = template.tasks[tabIndex] || [];
+  const checks = template.checks[tabIndex] || [];
   const allDone = tasks.length > 0 && checks.every(c => c);
 
   // ここではメッセージと表情だけ変える
@@ -756,9 +824,10 @@ function handleTaskChecked() {
 }
 
 function refreshPoyoMessageForActiveTab() {
+  const template = getCurrentTemplate();
   const tabIndex = state.activeTab;
-  const tasks = state.tasks[tabIndex] || [];
-  const checks = state.checks[tabIndex] || [];
+  const tasks = template.tasks[tabIndex] || [];
+  const checks = template.checks[tabIndex] || [];
 
   // 何もタスクがないときは、とりあえず通常メッセージ
   if (!tasks.length) {
@@ -934,14 +1003,14 @@ function setupGuardianSaveButton() {
 
   saveBtn.addEventListener("click", () => {
     if (!guardianDraft) {
-      // 下書きがなければ何もしない
       return;
     }
 
-    // ① 下書き内容を state に反映
-    state.tabs  = guardianDraft.tabs.map((t) => t);
-    state.tasks = guardianDraft.tasks.map((list) => [...list]);
-    state.checks = guardianDraft.checks.map((list) => [...list]);
+    // ① 下書き内容を現在のテンプレートに反映
+    const template = getCurrentTemplate();
+    template.tabs  = guardianDraft.tabs.map((t) => t);
+    template.tasks = guardianDraft.tasks.map((list) => [...list]);
+    template.checks = guardianDraft.checks.map((list) => [...list]);
 
     // ② 保護者モードを終了（下書きも破棄）
     state.guardianMode = false;
@@ -949,12 +1018,62 @@ function setupGuardianSaveButton() {
 
     // ③ 保存・見た目・チェックリストを更新
     saveState();
-    applyGuardianModeState();   // ボタンのON/OFF表示など
+    applyGuardianModeState();
     renderTabs();
     renderTasks();
     syncHanamaruForActiveTab({ celebrate: false });
     refreshPoyoMessageForActiveTab();
   });
+}
+
+// 平日/休日ボタンの切り替え
+function setupTemplateSwitchButtons() {
+  const weekdayBtn = document.getElementById("template-weekday-btn");
+  const holidayBtn = document.getElementById("template-holiday-btn");
+  
+  if (!weekdayBtn || !holidayBtn) return;
+
+  function updateButtonState() {
+    if (state.templateMode === "weekday") {
+      weekdayBtn.classList.add("active");
+      holidayBtn.classList.remove("active");
+    } else {
+      weekdayBtn.classList.remove("active");
+      holidayBtn.classList.add("active");
+    }
+  }
+
+function switchTemplate(mode) {
+  // 同じモードなら何もしない
+  if (state.templateMode === mode) return;
+
+  // テンプレート切り替え
+  state.templateMode = mode;
+
+  // 保護者モード中にテンプレ切り替えしたときは、
+  // 下書きはそのテンプレート用に作り直したいので一度捨てる
+  guardianDraft = null;
+
+  saveState();
+  updateButtonState();
+  renderTabs();
+  renderTasks();
+  syncHanamaruForActiveTab({ celebrate: false });
+  syncGuardianEditor();
+  refreshPoyoMessageForActiveTab();
+}
+
+
+  weekdayBtn.addEventListener("click", () => {
+    switchTemplate("weekday");
+  });
+
+  holidayBtn.addEventListener("click", () => {
+    switchTemplate("holiday");
+  });
+
+  // 初期状態の反映
+  updateButtonState();
 }
 
 // 初期化
@@ -964,6 +1083,7 @@ function init() {
   renderTabs();
   renderTasks();
   setupGuardianMode();
+  setupTemplateSwitchButtons();
   setupGuardianSaveButton();
   setupGuardianQuiz();
   setupAccessorySelect();
