@@ -517,6 +517,21 @@ body.guardian-mode .guardian-editor {
   margin-bottom: 6px;
 }
 
+/* 並べ替え用ハンドル */
+.guardian-task-handle {
+  flex: 0 0 auto;
+  cursor: grab;
+  user-select: none;
+  font-size: 1.1rem;
+  padding: 4px 4px;
+  color: var(--muted);
+}
+
+/* ドラッグ中の見た目（お好みで調整OK） */
+.guardian-task-row-ghost {
+  opacity: 0.5;
+}
+
 .guardian-task-delete {
   flex: 0 0 auto;
   padding: 4px 8px;

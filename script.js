@@ -562,6 +562,12 @@ function syncGuardianEditor() {
   tasks.forEach((text, i) => {
     const row = document.createElement("div");
     row.className = "guardian-task-row";
+    row.dataset.index = String(i); // 並び替え後に使う
+
+    // ドラッグ用ハンドル
+    const handle = document.createElement("span");
+    handle.className = "guardian-task-handle";
+    handle.textContent = "≡";
 
     const input = document.createElement("input");
     input.type = "text";
@@ -582,6 +588,7 @@ function syncGuardianEditor() {
       syncGuardianEditor();
     });
 
+    row.appendChild(handle);
     row.appendChild(input);
     row.appendChild(delBtn);
     listContainer.appendChild(row);
@@ -598,6 +605,42 @@ function syncGuardianEditor() {
     src.checks[idx].push(false);
     syncGuardianEditor();
   };
+
+  // ★ 並べ替え（ドラッグ＆ドロップ）を有効化
+  if (window.Sortable) {
+    // 前回のインスタンスがあれば破棄
+    if (listContainer._sortableInstance) {
+      listContainer._sortableInstance.destroy();
+      listContainer._sortableInstance = null;
+    }
+
+    listContainer._sortableInstance = Sortable.create(listContainer, {
+      animation: 120,
+      handle: ".guardian-task-handle",
+      ghostClass: "guardian-task-row-ghost",
+      onEnd: () => {
+        const tabIndex = state.activeTab;
+        const oldTasks = src.tasks[tabIndex];
+        const oldChecks = src.checks[tabIndex];
+        const newTasks = [];
+        const newChecks = [];
+
+        listContainer.querySelectorAll(".guardian-task-row").forEach((rowEl) => {
+          const idx = Number(rowEl.dataset.index);
+          if (!Number.isNaN(idx) && oldTasks[idx] !== undefined) {
+            newTasks.push(oldTasks[idx]);
+            newChecks.push(oldChecks[idx]);
+          }
+        });
+
+        src.tasks[tabIndex] = newTasks;
+        src.checks[tabIndex] = newChecks;
+
+        // data-index を振り直すために再描画
+        syncGuardianEditor();
+      }
+    });
+  }
 }
 
 function setupGuardianQuiz() {
