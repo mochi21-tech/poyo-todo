@@ -520,6 +520,7 @@ function setupAccessoryToggle() {
   function apply() {
     accessoryBar.classList.toggle("is-hidden", !isVisible);
     toggleBtn.setAttribute("aria-pressed", isVisible ? "true" : "false");
+    document.body.classList.toggle("accessory-open", isVisible);
   }
 
   toggleBtn.addEventListener("click", () => {

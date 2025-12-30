@@ -850,7 +850,32 @@ body.guardian-mode .guardian-editor {
   }
 
   .app {
+    height: 100vh;
+    min-height: 0;
     grid-template-columns: 260px 1fr;
+  }
+
+  /* 画面が低いとき：アクセサリーバーは下に固定し、必要ならメッセージが上に逃げる */
+  .poyo-area {
+    position: relative;
+    justify-content: flex-start;
+    padding-bottom: 0;
+  }
+
+  body.accessory-open .poyo-area {
+    padding-bottom: 56px; /* アクセサリーバー分のスペース */
+  }
+
+  .accessory-bar {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    margin-top: 0;
+  }
+
+  body.accessory-open .poyo-message-group {
+    transform: translateY(-6px);
   }
 
   /* ★ぽよ一式をまとめて縮小 */
@@ -862,7 +887,7 @@ body.guardian-mode .guardian-editor {
   .clock-time { font-size: 2.2rem; }
   .clock-date { font-size: 0.95rem; }
 
-  .right-panel { padding: 12px 14px; }
+  .right-panel { padding: 12px 14px; min-height: 0; }
 
   .tabs { margin-bottom: 10px; }
   .tab-button { padding: 8px 6px; font-size: 0.88rem; }
