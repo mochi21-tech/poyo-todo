@@ -846,63 +846,69 @@ body.guardian-mode .guardian-editor {
   :root {
     --app-pad: 12px;
     --app-gap: 12px;
-    --poyo-size: clamp(120px, 20vw, 170px);
+    /* transform縮小ではなく、実サイズで縮める（レイアウトも一緒に縮む） */
+    --poyo-size: clamp(110px, min(20vw, 34vh), 170px);
   }
 
+  /* 画面高さに合わせて下にはみ出しにくくする */
   .app {
     height: 100vh;
     min-height: 0;
+  }
+
+  .app {
     grid-template-columns: 260px 1fr;
   }
 
-  /* 画面が低いとき：アクセサリーバーは下に固定し、必要ならメッセージが上に逃げる */
-  .poyo-area {
-    position: relative;
-    justify-content: flex-start;
-    padding-bottom: 0;
-  }
-
-  body.accessory-open .poyo-area {
-    padding-bottom: 56px; /* アクセサリーバー分のスペース */
-  }
-
-  .accessory-bar {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    margin-top: 0;
-    z-index: 1;
-  }
-
-  body.accessory-open .poyo-message-group {
-    transform: translateY(-6px);
-    position: relative;
-    z-index: 2;
-  }
-
-  /* 開いているときだけ：ボタンを少しだけ上に逃がして被りを防ぐ */
-  body.accessory-open .poyo-accessory-toggle-btn {
-    position: relative;
-    top: -10px;
-    z-index: 3;
-  }
-
-  /* ★ぽよ一式をまとめて縮小 */
+  /* ★見た目だけ縮めるtransformはやめる（レイアウトが縮まず、はみ出しやすい） */
   .poyo-wrapper {
-    transform: scale(0.8);
-    transform-origin: center top;
+    transform: none;
   }
 
-  .clock-time { font-size: 2.2rem; }
-  .clock-date { font-size: 0.95rem; }
+  /* 密度を少し下げて詰まりを緩和 */
+  .left-panel { gap: 8px; }
+  .poyo-area { gap: 4px; }
 
-  .right-panel { padding: 12px 14px; min-height: 0; }
+  .clock-time { font-size: 2.15rem; }
+  .clock-date { font-size: 0.92rem; }
+
+  .poyo-message {
+    font-size: 0.95rem;
+    padding: 5px 9px;
+    min-height: 2.2em;
+  }
+
+  .poyo-message-group { margin-top: 2px; }
+
+  .right-panel { padding: 12px 14px; }
 
   .tabs { margin-bottom: 10px; }
   .tab-button { padding: 8px 6px; font-size: 0.88rem; }
 
   .task-text { font-size: 1rem; }
+}
+
+/* ====== さらに高さが短い端末：メッセージを少し被せて省スペース（3-A） ====== */
+@media (orientation: landscape) and (max-height: 420px) {
+  :root {
+    --poyo-size: clamp(95px, min(18vw, 28vh), 150px);
+  }
+
+  .clock-time { font-size: 2.0rem; }
+  .clock-date { font-size: 0.88rem; }
+
+  .left-panel { gap: 6px; }
+  .poyo-area { gap: 2px; }
+
+  .poyo-message {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+
+  /* ぽよの上に“少しだけ”被せる（見た目を壊さない範囲） */
+  .poyo-message-group {
+    margin-top: -8px;
+  }
 }
 
 /* PC表示のときは、タブ＋リストが入っているボックスごと少し下げる */
