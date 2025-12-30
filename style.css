@@ -872,10 +872,20 @@ body.guardian-mode .guardian-editor {
     bottom: 0;
     transform: translateX(-50%);
     margin-top: 0;
+    z-index: 1;
   }
 
   body.accessory-open .poyo-message-group {
     transform: translateY(-6px);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 開いているときだけ：ボタンを少しだけ上に逃がして被りを防ぐ */
+  body.accessory-open .poyo-accessory-toggle-btn {
+    position: relative;
+    top: -10px;
+    z-index: 3;
   }
 
   /* ★ぽよ一式をまとめて縮小 */

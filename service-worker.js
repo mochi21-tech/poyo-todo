@@ -1,5 +1,5 @@
 // キャッシュの名前（更新したくなったら v2, v3 と変える）
-const CACHE_NAME = "poyo-cache-v11";
+const CACHE_NAME = "poyo-cache-v12";
 
 // オフラインでも使いたいファイルを列挙
 const URLS_TO_CACHE = [
