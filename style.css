@@ -176,10 +176,10 @@ body {
 /* ぽよのリボン */
 .poyo-ribbon {
   position: absolute;
-  bottom: calc(100% - 36px); /* ここで“画像の下”の高さを調整 */
+  bottom: calc(100% - (var(--poyo-size) * 0.16)); /* ここで“画像の下”の高さを調整 */
   left: 50%;
   transform: translateX(-50%);
-  width: 110px;
+  width: calc(var(--poyo-size) * 0.5);
   max-width: 70%;
   pointer-events: none;
 }
