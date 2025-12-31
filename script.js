@@ -64,7 +64,7 @@ const ACCESSORY_CONFIG = [
 ];
 
 // ぽよのメッセージ候補
-const POYO_MESSAGES_NORMAL_ADD = [
+const POYO_MESSAGES_NORMAL = [
   "まず一つやってみよう。",
   "ゆっくりでもだいじょうぶ。",
   "できるところからでいいよ。",
@@ -75,7 +75,7 @@ const POYO_MESSAGES_NORMAL_ADD = [
   "少しずつでいいよ。"
 ];
 
-const POYO_MESSAGES_CHECK_ADD = [
+const POYO_MESSAGES_CHECK = [
   "いいね。一つできた。",
   "ちゃんと進んでるよ。",
   "そのやり方で大丈夫。",
@@ -86,7 +86,7 @@ const POYO_MESSAGES_CHECK_ADD = [
   "力がついてきたね。"
 ];
 
-const POYO_MESSAGES_ALL_DONE_ADD = [
+const POYO_MESSAGES_ALL_DONE = [
   "ぜんぶ終わったね。",
   "今日の分、できたね。",
   "はなまるいっぱい！",
