@@ -44,23 +44,20 @@ const INITIAL_TASKS = [
 // ※id は好きな名前でOK。ラベル名もあとで変えて大丈夫です。
 const ACCESSORY_CONFIG = [
   { id: "none",   label: "なし",           requiredCount: 0,  src: null },
-  { id: "acc16",  label: "リボン",         requiredCount: 0,  src: "asset/asset16.svg" },
   { id: "acc2",   label: "ねこ",           requiredCount: 1,  src: "asset/asset2.svg" },
   { id: "acc3",   label: "ぱんだ",         requiredCount: 3,  src: "asset/asset3.svg" },
   { id: "acc4",   label: "きつね",         requiredCount: 5, src: "asset/asset4.svg" },
   { id: "acc5",   label: "コアラ",         requiredCount: 8, src: "asset/asset5.svg" },
   { id: "acc6",   label: "ヤギ",           requiredCount: 11, src: "asset/asset6.svg" },
   { id: "acc7",   label: "くま",           requiredCount: 14, src: "asset/asset7.svg" },
-  { id: "acc17",  label: "星",             requiredCount: 17, src: "asset/asset17.svg" },
-  { id: "acc8",   label: "いぬ",           requiredCount: 20, src: "asset/asset8.svg" },
-  { id: "acc9",   label: "ライオン",       requiredCount: 23, src: "asset/asset9.svg" },
-  { id: "acc10",  label: "ねずみ",         requiredCount: 26, src: "asset/asset10.svg" },
-  { id: "acc11",  label: "キリン",         requiredCount: 29, src: "asset/asset11.svg" },
-  { id: "acc1",   label: "うさぎ",         requiredCount: 32, src: "asset/asset1.svg" },
-  { id: "acc12",  label: "シカ",           requiredCount: 35, src: "asset/asset12.svg" },
-  { id: "acc13",  label: "トラ",           requiredCount: 38, src: "asset/asset13.svg" },
-  { id: "acc14",  label: "うし",           requiredCount: 41, src: "asset/asset14.svg" },
-  { id: "acc15",  label: "クラウン",       requiredCount: 44, src: "asset/asset15.svg" },
+  { id: "acc8",   label: "いぬ",           requiredCount: 17, src: "asset/asset8.svg" },
+  { id: "acc9",   label: "ライオン",       requiredCount: 20, src: "asset/asset9.svg" },
+  { id: "acc10",  label: "ねずみ",         requiredCount: 23, src: "asset/asset10.svg" },
+  { id: "acc11",  label: "キリン",         requiredCount: 26, src: "asset/asset11.svg" },
+  { id: "acc1",   label: "うさぎ",         requiredCount: 29, src: "asset/asset1.svg" },
+  { id: "acc12",  label: "シカ",           requiredCount: 32, src: "asset/asset12.svg" },
+  { id: "acc13",  label: "トラ",           requiredCount: 35, src: "asset/asset13.svg" },
+  { id: "acc14",  label: "うし",           requiredCount: 38, src: "asset/asset14.svg" },
 ];
 
 // ぽよのメッセージ候補
