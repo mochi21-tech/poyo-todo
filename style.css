@@ -978,10 +978,12 @@ body.guardian-mode .guardian-editor {
   display: none;
 }
 
-body.guardian-mode .purchase-btn {
+body.guardian-mode.is-android-app .purchase-btn {
   display: inline-flex;
 }
-
+body.is-android-app .fullscreen-btn {
+  display: none !important;
+}
 /* スマホ表示のとき：helpボタンも丸アイコン化 */
 @media (max-width: 768px) {
 

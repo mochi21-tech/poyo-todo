@@ -2,6 +2,23 @@
 let lastFocusedElement = null;
 
 // ========================
+// 実行環境（Web / Androidアプリ）判定
+// ========================
+function isAndroidAppRuntime() {
+  try {
+    const url = new URL(window.location.href);
+    const flag = (url.searchParams.get("app") || "").toLowerCase();
+    if (flag === "1" || flag === "android" || flag === "app") return true;
+  } catch (e) {}
+
+  return false;
+}
+
+const RUNTIME = {
+  isAndroidApp: isAndroidAppRuntime(),
+};
+
+// ========================
 // 編集していいエリア（初期値）
 // ========================
 
@@ -346,8 +363,18 @@ function isAccessoryUnlocked(conf, perfectCount, ownedSkus) {
 
   // 課金で開放
   if (conf.unlockType === "paid") {
-    return !!ownedSkus?.[conf.sku];
+  const owned = !!state.ownedSkus?.[conf.sku];
+  option.disabled = !owned;
+
+  if (owned) {
+    option.textContent = conf.label;
+  } else {
+    option.textContent = RUNTIME.isAndroidApp
+      ? `${conf.label}（購入で開放）`
+      : `${conf.label}（アプリで購入）`;
   }
+  return;
+}
 
   // がんばった日数で開放（いままで通り）
   return (conf.requiredCount ?? 0) <= perfectCount;
@@ -1062,6 +1089,13 @@ function setupPurchaseOverlay() {
 
   if (!btn || !overlay || !closeBtn || !restoreBtn || !listEl) return;
 
+// Web(ブラウザ)で開いたときは購入機能を無効化（Androidアプリ側だけ許可）
+  if (!RUNTIME.isAndroidApp) {
+    btn.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    return;
+  }
+
 function handleTestPurchase(conf) {
   if (!state.ownedSkus) {
     state.ownedSkus = {};
@@ -1303,6 +1337,7 @@ function switchTemplate(mode) {
 // 初期化
 function init() {
   loadState();
+  document.body.classList.toggle("is-android-app", RUNTIME.isAndroidApp);
   resetIfNeeded();
   renderTabs();
   renderTasks();
@@ -1343,7 +1378,13 @@ function init() {
   // ぽよを触ったときだけ、ぽよーんと弾ませて口を●にする
   setupPoyoTap();
 
-  setupFullscreenButton();
+  //全画面ボタンの初期化を条件分岐
+    if (!RUNTIME.isAndroidApp) {
+    setupFullscreenButton();
+  } else {
+    const fsBtn = document.getElementById("fullscreen-btn");
+    if (fsBtn) fsBtn.style.display = "none";
+  }
   setupHelpOverlay();
   setupPurchaseOverlay();
 
