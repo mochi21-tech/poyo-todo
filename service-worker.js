@@ -1,5 +1,5 @@
 // キャッシュの名前（更新したくなったら v2, v3 と変える）
-const CACHE_NAME = "poyo-cache-v23";
+const CACHE_NAME = "poyo-cache-v24";
 
 // オフラインでも使いたいファイルを列挙
 const URLS_TO_CACHE = [
@@ -33,6 +33,7 @@ const URLS_TO_CACHE = [
   "./asset/fullscreen-on.svg",
   "./asset/setting.svg",
   "./asset/guardian.svg",
+  "./asset/cart.svg",
 ];
 
 // インストール時：まとめてキャッシュに入れる
