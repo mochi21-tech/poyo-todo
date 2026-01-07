@@ -3,7 +3,9 @@
    レイアウト再設計（崩れない版）
    ============================== */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 :root {
   --bg: #f3efe8;
@@ -21,19 +23,32 @@
 }
 
 html,
-body { height: 100%; }
+body {
+  height: 100%;
+}
 
 body {
   margin: 0;
   font-family: "Noto Sans JP", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  overflow: hidden; /* ページ全体はスクロールさせない */
+  overflow: hidden;
+  /* ページ全体はスクロールさせない */
+  /* 画面全体を縦並びFlexにして .app を余り埋めさせる */
+  display: flex;
+  flex-direction: column;
 }
 
 /* ====== 全体レイアウト ====== */
 .app {
-  min-height: 100vh;
+  /* height: 100vh; ← 削除 */
+  flex: 1;
+  /* 残りの高さを埋める */
+  min-height: 0;
+  /* 縮小可能にする */
+  overflow: hidden;
+  /* はみ出し禁止 */
+
   padding: var(--app-pad);
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -115,12 +130,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--poyo-size) * 0.13); 
+  gap: calc(var(--poyo-size) * 0.13);
 }
 
 .poyo-eye {
-  width:  calc(var(--poyo-size) * 0.044);
-  height:  calc(var(--poyo-size) * 0.044);
+  width: calc(var(--poyo-size) * 0.044);
+  height: calc(var(--poyo-size) * 0.044);
   border-radius: 50%;
   background: #3a2f2a;
   position: relative;
@@ -145,7 +160,9 @@ body {
   animation: none;
 }
 
-.poyo-eye.smiling::before { opacity: 1; }
+.poyo-eye.smiling::before {
+  opacity: 1;
+}
 
 /* 口 */
 .poyo-mouth {
@@ -156,8 +173,8 @@ body {
 }
 
 .poyo-mouth-dot {
-  width:  calc(var(--poyo-size) * 0.044);
-  height:  calc(var(--poyo-size) * 0.044);
+  width: calc(var(--poyo-size) * 0.044);
+  height: calc(var(--poyo-size) * 0.044);
   border-radius: 50%;
   background: hsl(19, 16%, 20%);
   transform-origin: center;
@@ -176,7 +193,8 @@ body {
 /* ぽよのリボン */
 .poyo-ribbon {
   position: absolute;
-  bottom: calc(100% - (var(--poyo-size) * 0.16)); /* ここで“画像の下”の高さを調整 */
+  bottom: calc(100% - (var(--poyo-size) * 0.16));
+  /* ここで“画像の下”の高さを調整 */
   left: 50%;
   transform: translateX(-50%);
   width: calc(var(--poyo-size) * 0.5);
@@ -319,7 +337,7 @@ body {
 .task-list {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -384,20 +402,26 @@ body {
   box-shadow: 0 0 0 2px rgba(240, 176, 143, 0.25);
 }
 
-.task-item input[type="checkbox"]:checked::before { transform: scale(1); }
+.task-item input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
 
 .task-item input[type="checkbox"]:checked::after {
   transform: translate(4px, 5px) rotate(-45deg) scale(1);
 }
 
-.task-item input[type="checkbox"]:hover { transform: translateY(-1px); }
+.task-item input[type="checkbox"]:hover {
+  transform: translateY(-1px);
+}
 
 .task-item input[type="checkbox"]:focus-visible {
   outline: 2px solid #f0b08f;
   outline-offset: 2px;
 }
 
-.task-text { font-size: 1.1rem; }
+.task-text {
+  font-size: 1.1rem;
+}
 
 .task-item.completed .task-text {
   text-decoration: line-through;
@@ -406,33 +430,82 @@ body {
 
 /* ====== アニメーション ====== */
 @keyframes mouthTalk {
-  0%   { transform: scale(1.1, 0.3); }
-  30%  { transform: scale(1.1, 1.3); }
-  60%  { transform: scale(0.7, 0.7); }
-  100% { transform: scale(1.1, 0.3); }
+  0% {
+    transform: scale(1.1, 0.3);
+  }
+
+  30% {
+    transform: scale(1.1, 1.3);
+  }
+
+  60% {
+    transform: scale(0.7, 0.7);
+  }
+
+  100% {
+    transform: scale(1.1, 0.3);
+  }
 }
 
 @keyframes blink {
-  0%, 92%, 100% { transform: scaleY(1); }
-  95%          { transform: scaleY(0.1); }
+
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0.1);
+  }
 }
 
 @keyframes poyoFloat {
-  0%   { transform: translateY(0) scale(1, 1); }
-  25%  { transform: translateY(-6px) scale(1.03, 0.97); }
-  50%  { transform: translateY(0) scale(0.98, 1.03); }
-  75%  { transform: translateY(-3px) scale(1.02, 0.98); }
-  100% { transform: translateY(0) scale(1, 1); }
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+
+  25% {
+    transform: translateY(-6px) scale(1.03, 0.97);
+  }
+
+  50% {
+    transform: translateY(0) scale(0.98, 1.03);
+  }
+
+  75% {
+    transform: translateY(-3px) scale(1.02, 0.98);
+  }
+
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
 }
 
-.poyo-tap { animation: poyoTap 0.6s cubic-bezier(0.25, 1.3, 0.4, 1) 1; }
+.poyo-tap {
+  animation: poyoTap 0.6s cubic-bezier(0.25, 1.3, 0.4, 1) 1;
+}
 
 @keyframes poyoTap {
-  0%   { transform: translateY(0) scale(1, 1); }
-  20%  { transform: translateY(-14px) scale(1.22, 0.9); }
-  50%  { transform: translateY(8px) scale(0.9, 1.18); }
-  80%  { transform: translateY(-3px) scale(1.06, 0.97); }
-  100% { transform: translateY(0) scale(1, 1); }
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+
+  20% {
+    transform: translateY(-14px) scale(1.22, 0.9);
+  }
+
+  50% {
+    transform: translateY(8px) scale(0.9, 1.18);
+  }
+
+  80% {
+    transform: translateY(-3px) scale(1.06, 0.97);
+  }
+
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
 }
 
 .poyo-happy {
@@ -440,9 +513,17 @@ body {
 }
 
 @keyframes poyoHappy {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.06); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* =========================
@@ -471,8 +552,15 @@ body {
 }
 
 @keyframes hanamaru-pop {
-  from { transform: scale(0.85); opacity: 0.0; }
-  to   { transform: scale(1);    opacity: 1.0; }
+  from {
+    transform: scale(0.85);
+    opacity: 0.0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1.0;
+  }
 }
 
 /* =========================
@@ -492,7 +580,7 @@ body.guardian-mode .guardian-editor {
   display: block;
 }
 
-.guardian-section + .guardian-section {
+.guardian-section+.guardian-section {
   margin-top: 10px;
 }
 
@@ -608,7 +696,7 @@ body.guardian-mode .guardian-editor {
   padding: 16px 18px 14px;
   border-radius: 16px;
   background: #fff7ec;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #f0d8b8;
 }
 
@@ -700,7 +788,7 @@ body.guardian-mode .guardian-editor {
   padding: 14px 16px 12px;
   border-radius: 16px;
   background: #fffef9;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #f0e4c8;
   display: flex;
   flex-direction: column;
@@ -721,7 +809,7 @@ body.guardian-mode .guardian-editor {
   color: #6c5845;
 }
 
-.help-section + .help-section {
+.help-section+.help-section {
   margin-top: 8px;
 }
 
@@ -762,7 +850,8 @@ body.guardian-mode .guardian-editor {
 /* 右上ボタンに help-btn を追加で適用 */
 .guardian-toggle-btn,
 .fullscreen-btn,
-.help-btn {
+.help-btn,
+.purchase-btn {
   font-size: 0.85rem;
   color: var(--muted);
   padding: 6px 14px;
@@ -782,18 +871,124 @@ body.guardian-mode .guardian-editor {
     color 0.15s ease;
 }
 
+
+/* =========================
+   購入 モーダル
+   ========================= */
+/* 購入モーダル内のリスト */
+.purchase-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.purchase-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.purchase-item__left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.purchase-item__name {
+  font-weight: 700;
+}
+
+.purchase-item__status {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.purchase-item__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* モーダル内の小ボタン（見た目は控えめに共通化） */
+.purchase-sub-btn,
+.purchase-buy-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.purchase-buy-btn[disabled] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.purchase-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.purchase-note {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+/* モーダル内のサムネサイズと並び */
+.purchase-item__left {
+  flex-direction: row;
+  /* 縦→横に */
+  align-items: center;
+  gap: 10px;
+}
+
+.purchase-item__thumb {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+}
+
+.purchase-item__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+
 .guardian-toggle-btn:active,
 .fullscreen-btn:active,
-.help-btn:active {
+.help-btn:active,
+.purchase-btn:active {
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
+/* 購入ボタンを非表示 */
+.purchase-btn {
+  display: none;
+}
+
+body.guardian-mode .purchase-btn {
+  display: inline-flex;
+}
+
 /* スマホ表示のとき：helpボタンも丸アイコン化 */
 @media (max-width: 768px) {
+
   .guardian-toggle-btn,
   .fullscreen-btn,
-  .help-btn {
+  .help-btn,
+  .purchase-btn {
     padding: 6px;
     width: 32px;
     height: 32px;
@@ -811,12 +1006,17 @@ body.guardian-mode .guardian-editor {
   }
 
   .poyo-area {
-    flex: 0 0 auto;           /* 残り高さぜんぶを使わない */
-    justify-content: flex-start;  /* 中央寄せやめて、上から順に並べる */
-    gap: 2px;                 /* ぽよとメッセージの間だけ、ほんの少し */
+    flex: 0 0 auto;
+    /* 残り高さぜんぶを使わない */
+    justify-content: flex-start;
+    /* 中央寄せやめて、上から順に並べる */
+    gap: 2px;
+    /* ぽよとメッセージの間だけ、ほんの少し */
   }
 
-  body { overflow: hidden; }
+  body {
+    overflow: hidden;
+  }
 
   .app {
     grid-template-columns: 1fr;
@@ -866,11 +1066,21 @@ body.guardian-mode .guardian-editor {
   }
 
   /* 密度を少し下げて詰まりを緩和 */
-  .left-panel { gap: 8px; }
-  .poyo-area { gap: 4px; }
+  .left-panel {
+    gap: 8px;
+  }
 
-  .clock-time { font-size: 2.15rem; }
-  .clock-date { font-size: 0.92rem; }
+  .poyo-area {
+    gap: 4px;
+  }
+
+  .clock-time {
+    font-size: 2.15rem;
+  }
+
+  .clock-date {
+    font-size: 0.92rem;
+  }
 
   .poyo-message {
     font-size: 0.95rem;
@@ -878,14 +1088,26 @@ body.guardian-mode .guardian-editor {
     min-height: 2.2em;
   }
 
-  .poyo-message-group { margin-top: 2px; }
+  .poyo-message-group {
+    margin-top: 2px;
+  }
 
-  .right-panel { padding: 12px 14px; }
+  .right-panel {
+    padding: 12px 14px;
+  }
 
-  .tabs { margin-bottom: 10px; }
-  .tab-button { padding: 8px 6px; font-size: 0.88rem; }
+  .tabs {
+    margin-bottom: 10px;
+  }
 
-  .task-text { font-size: 1rem; }
+  .tab-button {
+    padding: 8px 6px;
+    font-size: 0.88rem;
+  }
+
+  .task-text {
+    font-size: 1rem;
+  }
 }
 
 /* ====== さらに高さが短い端末：メッセージを少し被せて省スペース（3-A） ====== */
@@ -894,11 +1116,21 @@ body.guardian-mode .guardian-editor {
     --poyo-size: clamp(95px, min(18vw, 28vh), 150px);
   }
 
-  .clock-time { font-size: 2.0rem; }
-  .clock-date { font-size: 0.88rem; }
+  .clock-time {
+    font-size: 2.0rem;
+  }
 
-  .left-panel { gap: 6px; }
-  .poyo-area { gap: 2px; }
+  .clock-date {
+    font-size: 0.88rem;
+  }
+
+  .left-panel {
+    gap: 6px;
+  }
+
+  .poyo-area {
+    gap: 2px;
+  }
 
   .poyo-message {
     font-size: 0.9rem;
@@ -1014,8 +1246,14 @@ body.is-fullscreen .fullscreen-btn .header-btn-icon {
   background-image: url("asset/fullscreen-on.svg");
 }
 
+/* 購入ボタンのアイコン */
+.purchase-btn .header-btn-icon {
+  background-image: url("asset/cart.svg");
+}
+
 /* スマホ表示：ボタンを丸いアイコンボタンにしてラベルを非表示＋ON表示を消す */
 @media (max-width: 768px) {
+
   .guardian-toggle-btn,
   .fullscreen-btn {
     padding: 6px;
@@ -1056,7 +1294,8 @@ body.is-fullscreen .fullscreen-btn .header-btn-icon {
   padding: 6px;
   border-radius: 999px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 6px; /* 時計とのすき間 */
+  margin-bottom: 6px;
+  /* 時計とのすき間 */
 }
 
 .template-btn {

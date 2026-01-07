@@ -1,15 +1,24 @@
+// 最後にフォーカスがあった要素をスナップショット（モーダル用）
+let lastFocusedElement = null;
+
 // ========================
 // 編集していいエリア（初期値）
 // ========================
 
-// 初期タブ名
+/**
+ * 初期タブ名の定義
+ * @type {string[]}
+ */
 const INITIAL_TABS = [
   "朝の準備",
   "帰ってから",
   "寝る前"
 ];
 
-// 各タブの初期タスク
+/**
+ * 各タブごとの初期タスクリスト
+ * @type {string[][]}
+ */
 const INITIAL_TASKS = [
   [
     "トイレに行ったかな？",
@@ -40,24 +49,31 @@ const INITIAL_TASKS = [
   ]
 ];
 
-// アクセサリー開放の設定
-// ※id は好きな名前でOK。ラベル名もあとで変えて大丈夫です。
+/**
+ * アクセサリー開放の設定
+ * unlockType: "paid" の場合は課金アイテム
+ * requiredCount: 必要ながんばった日数
+ * @type {object[]}
+ */
 const ACCESSORY_CONFIG = [
   { id: "none",   label: "なし",           requiredCount: 0,  src: null },
   { id: "acc2",   label: "ねこ",           requiredCount: 1,  src: "asset/asset2.svg" },
-  { id: "acc3",   label: "ぱんだ",         requiredCount: 3,  src: "asset/asset3.svg" },
-  { id: "acc4",   label: "きつね",         requiredCount: 5, src: "asset/asset4.svg" },
-  { id: "acc5",   label: "コアラ",         requiredCount: 8, src: "asset/asset5.svg" },
-  { id: "acc6",   label: "ヤギ",           requiredCount: 11, src: "asset/asset6.svg" },
-  { id: "acc7",   label: "くま",           requiredCount: 14, src: "asset/asset7.svg" },
-  { id: "acc8",   label: "いぬ",           requiredCount: 17, src: "asset/asset8.svg" },
-  { id: "acc9",   label: "ライオン",       requiredCount: 20, src: "asset/asset9.svg" },
-  { id: "acc10",  label: "ねずみ",         requiredCount: 23, src: "asset/asset10.svg" },
-  { id: "acc11",  label: "キリン",         requiredCount: 26, src: "asset/asset11.svg" },
-  { id: "acc1",   label: "うさぎ",         requiredCount: 29, src: "asset/asset1.svg" },
-  { id: "acc12",  label: "シカ",           requiredCount: 32, src: "asset/asset12.svg" },
-  { id: "acc13",  label: "トラ",           requiredCount: 35, src: "asset/asset13.svg" },
-  { id: "acc14",  label: "うし",           requiredCount: 38, src: "asset/asset14.svg" },
+  { id: "acc3",   label: "ぱんだ",         requiredCount: 2,  src: "asset/asset3.svg" },
+  { id: "acc4",   label: "きつね",         requiredCount: 4, src: "asset/asset4.svg" },
+  { id: "acc5",   label: "コアラ",         requiredCount: 6, src: "asset/asset5.svg" },
+  { id: "acc6",   label: "ヤギ",           requiredCount: 9, src: "asset/asset6.svg" },
+  { id: "acc7",   label: "くま",           requiredCount: 12, src: "asset/asset7.svg" },
+  { id: "acc8",   label: "いぬ",           requiredCount: 15, src: "asset/asset8.svg" },
+  { id: "acc9",   label: "ライオン",       requiredCount: 18, src: "asset/asset9.svg" },
+  { id: "acc10",  label: "ねずみ",         requiredCount: 21, src: "asset/asset10.svg" },
+  { id: "acc11",  label: "キリン",         requiredCount: 24, src: "asset/asset11.svg" },
+  { id: "acc1",   label: "うさぎ",         requiredCount: 27, src: "asset/asset1.svg" },
+  { id: "acc12",  label: "シカ",           requiredCount: 30, src: "asset/asset12.svg" },
+  { id: "acc13",  label: "トラ",           requiredCount: 33, src: "asset/asset13.svg" },
+  { id: "acc14",  label: "うし",           requiredCount: 36, src: "asset/asset14.svg" },
+  { id: "acc15", label: "クラウン", requiredCount: 0, src: "asset/asset15.svg", unlockType: "paid", sku: "acc_15" },
+  { id: "acc16", label: "リボン",   requiredCount: 0, src: "asset/asset16.svg", unlockType: "paid", sku: "acc_16" },
+  { id: "acc17", label: "星",       requiredCount: 0, src: "asset/asset17.svg", unlockType: "paid", sku: "acc_17" },
 ];
 
 // ぽよのメッセージ候補
@@ -126,6 +142,12 @@ let state = {
   accessory: "none",
   accessoryPanelVisible: true,
   perfectCount: 0
+};
+
+state.ownedSkus = {
+  acc_15: false,
+  acc_16: false,
+  acc_17: false
 };
 
 let guardianDraft = null;
@@ -288,6 +310,10 @@ function loadState() {
           : true;
       state.perfectCount =
         typeof data.perfectCount === "number" ? data.perfectCount : 0;
+        
+      if (data.ownedSkus) {
+      state.ownedSkus = data.ownedSkus;
+      }
     }
     
     // 起動時に自動判定
@@ -309,9 +335,22 @@ function saveState() {
     guardianMode: state.guardianMode,
     accessory: state.accessory,
     accessoryPanelVisible: state.accessoryPanelVisible,
-    perfectCount: state.perfectCount
+    perfectCount: state.perfectCount,
+    ownedSkus: state.ownedSkus
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function isAccessoryUnlocked(conf, perfectCount, ownedSkus) {
+  if (conf.id === "none") return true;
+
+  // 課金で開放
+  if (conf.unlockType === "paid") {
+    return !!ownedSkus?.[conf.sku];
+  }
+
+  // がんばった日数で開放（いままで通り）
+  return (conf.requiredCount ?? 0) <= perfectCount;
 }
 
 // 日付が変わったら「全部チェックの日」をカウントしてからチェックをリセット
@@ -462,12 +501,26 @@ function updateAccessoryOptions() {
     const option = select.querySelector(`option[value="${conf.id}"]`);
     if (!option) return;
 
+    // 「なし」は常に選べる
+    if (conf.id === "none") {
+      option.disabled = false;
+      option.textContent = conf.label;
+      return;
+    }
+
+    // 課金で開放（acc15〜17）
+    if (conf.unlockType === "paid") {
+      const owned = !!state.ownedSkus?.[conf.sku];
+      option.disabled = !owned;
+      option.textContent = owned ? conf.label : `${conf.label}（購入で開放）`;
+      return;
+    }
+
+    // がんばった日数で開放（asset1〜14は今まで通り）
     if (conf.requiredCount <= perfect) {
-      // 開放済み
       option.disabled = false;
       option.textContent = conf.label;
     } else {
-      // まだ開放されていない → 残り日数を表示
       const remaining = conf.requiredCount - perfect;
       option.disabled = true;
       option.textContent = `${conf.label}（あと${remaining}日）`;
@@ -477,12 +530,19 @@ function updateAccessoryOptions() {
   // もし今選んでいるアクセサリーがロック状態になっていたら、
   // 使えるものの中から先頭のものに戻す
   const current = ACCESSORY_CONFIG.find(c => c.id === state.accessory);
-  if (!current || current.requiredCount > perfect) {
-    const firstUnlocked = ACCESSORY_CONFIG.find(c => c.requiredCount <= perfect);
+  const currentUnlocked = current
+    ? isAccessoryUnlocked(current, perfect, state.ownedSkus)
+    : false;
+
+  if (!current || !currentUnlocked) {
+    const firstUnlocked = ACCESSORY_CONFIG.find(c =>
+      isAccessoryUnlocked(c, perfect, state.ownedSkus)
+    );
     if (firstUnlocked) {
       state.accessory = firstUnlocked.id;
       select.value = firstUnlocked.id;
       applyAccessoryFromState();
+      saveState();
     }
   }
 }
@@ -555,6 +615,9 @@ function openGuardianQuiz() {
 
   if (!overlay || !aEl || !bEl || !answerInput || !errorEl) return;
 
+  // フォーカス元を記憶
+  lastFocusedElement = document.activeElement;
+
   guardianQuiz.a = Math.floor(Math.random() * 8) + 2;
   guardianQuiz.b = Math.floor(Math.random() * 8) + 2;
 
@@ -580,6 +643,12 @@ function closeGuardianQuiz() {
   overlay.classList.remove("is-visible");
   overlay.setAttribute("aria-hidden", "true");
   errorEl.textContent = "";
+
+  // フォーカスを戻す
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
 }
 
 // ========================
@@ -957,13 +1026,20 @@ function setupHelpOverlay() {
   if (!helpBtn || !overlay || !closeBtn) return;
 
   function openHelp() {
+    lastFocusedElement = document.activeElement; // 記憶
     overlay.classList.add("is-visible");
     overlay.setAttribute("aria-hidden", "false");
+    // 閉じるボタンにフォーカスを移動
+    closeBtn.focus();
   }
 
   function closeHelp() {
     overlay.classList.remove("is-visible");
     overlay.setAttribute("aria-hidden", "true");
+    if (lastFocusedElement) {
+      lastFocusedElement.focus();
+      lastFocusedElement = null;
+    }
   }
 
   helpBtn.addEventListener("click", openHelp);
@@ -975,6 +1051,146 @@ function setupHelpOverlay() {
     }
   });
 }
+
+//購入モーダル
+function setupPurchaseOverlay() {
+  const btn = document.getElementById("purchase-btn");
+  const overlay = document.getElementById("purchase-overlay");
+  const closeBtn = document.getElementById("purchase-close");
+  const restoreBtn = document.getElementById("purchase-restore");
+  const listEl = document.getElementById("purchase-list");
+
+  if (!btn || !overlay || !closeBtn || !restoreBtn || !listEl) return;
+
+function handleTestPurchase(conf) {
+  if (!state.ownedSkus) {
+    state.ownedSkus = {};
+  }
+
+  // このアクセサリーを「購入済み」にする（テスト用）
+  state.ownedSkus[conf.sku] = true;
+  saveState();
+
+  // アクセサリープルダウンのロック状態を更新
+  updateAccessoryOptions();
+
+  // 今の選択がロックされている場合は、買ったアクセサリーを選択する
+  const select = document.getElementById("accessory-select");
+  if (select) {
+    const perfect = state.perfectCount || 0;
+    const currentConf = ACCESSORY_CONFIG.find(c => c.id === state.accessory);
+    const currentUnlocked = currentConf
+      ? isAccessoryUnlocked(currentConf, perfect, state.ownedSkus)
+      : false;
+
+    if (!currentUnlocked) {
+      state.accessory = conf.id;
+      select.value = conf.id;
+      applyAccessoryFromState();
+      saveState();
+    }
+  }
+
+  // モーダル内の表示を更新
+  renderPurchaseList();
+
+  alert(`${conf.label} を「購入済み」にしました（テスト用・課金は発生しません）`);
+}
+
+
+function renderPurchaseList() {
+  const paidItems = ACCESSORY_CONFIG.filter(c => c.unlockType === "paid");
+  listEl.innerHTML = "";
+
+  paidItems.forEach((conf) => {
+    const owned = !!state.ownedSkus?.[conf.sku];
+
+    const row = document.createElement("div");
+    row.className = "purchase-item";
+
+    const left = document.createElement("div");
+    left.className = "purchase-item__left";
+
+    const thumb = document.createElement("img");
+    thumb.className = "purchase-item__thumb";
+    thumb.src = conf.src;
+    thumb.alt = conf.label;
+
+    const name = document.createElement("div");
+    name.className = "purchase-item__name";
+    name.textContent = conf.label;
+
+    const status = document.createElement("div");
+    status.className = "purchase-item__status";
+    status.textContent = owned ? "購入済み" : "未購入";
+
+    // 文字をまとめる箱
+    const textBox = document.createElement("div");
+    textBox.className = "purchase-item__text";
+    textBox.appendChild(name);
+    textBox.appendChild(status);
+
+    left.appendChild(thumb);
+    left.appendChild(textBox);
+
+    const right = document.createElement("div");
+    right.className = "purchase-item__right";
+
+    const buyBtn = document.createElement("button");
+    buyBtn.type = "button";
+    buyBtn.className = "purchase-buy-btn";
+    buyBtn.textContent = owned ? "購入済み" : "購入";
+    buyBtn.disabled = owned;
+
+    // ★テスト用購入：クリックでローカルだけ「購入済み」にする
+    buyBtn.addEventListener("click", () => {
+      if (!owned) {
+        handleTestPurchase(conf);
+      }
+    });
+
+    right.appendChild(buyBtn);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    listEl.appendChild(row);
+  });
+}
+
+
+  function open() {
+    lastFocusedElement = document.activeElement; // 記憶
+    renderPurchaseList();
+    overlay.classList.add("is-visible");
+    overlay.setAttribute("aria-hidden", "false");
+    // 閉じるボタン等へフォーカス（ここではcloseBtnへ）
+    closeBtn.focus();
+  }
+
+  function close() {
+    overlay.classList.remove("is-visible");
+    overlay.setAttribute("aria-hidden", "true");
+    if (lastFocusedElement) {
+      lastFocusedElement.focus();
+      lastFocusedElement = null;
+    }
+  }
+
+  btn.addEventListener("click", open);
+  closeBtn.addEventListener("click", close);
+
+  // 復元（購入履歴からの復元＝将来ここで購入済み照会）
+  restoreBtn.addEventListener("click", () => {
+    alert("復元（購入済み確認）は、後でGoogleの仕組みにつなげます");
+    renderPurchaseList();
+  });
+
+  // 背景タップで閉じる
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+}
+
 
 function setupGuardianMode() {
   const btn = document.getElementById("guardian-toggle-btn");
@@ -1129,6 +1345,7 @@ function init() {
 
   setupFullscreenButton();
   setupHelpOverlay();
+  setupPurchaseOverlay();
 
   // はなまるをタップしたら閉じる
   const overlay = document.getElementById("hanamaru-overlay");
