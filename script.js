@@ -93,6 +93,11 @@ const ACCESSORY_CONFIG = [
   { id: "acc17", label: "星",       requiredCount: 0, src: "asset/asset17.svg", unlockType: "paid", sku: "acc_17" },
 ];
 
+// ブラウザ版では課金アクセを「存在しない扱い」にする
+const ACCESSORY_CONFIG_EFFECTIVE = RUNTIME.isAndroidApp
+  ? ACCESSORY_CONFIG
+  : ACCESSORY_CONFIG.filter(c => c.unlockType !== "paid");
+
 // ぽよのメッセージ候補
 const POYO_MESSAGES_NORMAL = [
   "まず一つやってみよう。",
@@ -359,24 +364,14 @@ function saveState() {
 }
 
 function isAccessoryUnlocked(conf, perfectCount, ownedSkus) {
-  if (conf.id === "none") return true;
+  if (!conf || conf.id === "none") return true;
 
   // 課金で開放
   if (conf.unlockType === "paid") {
-  const owned = !!state.ownedSkus?.[conf.sku];
-  option.disabled = !owned;
-
-  if (owned) {
-    option.textContent = conf.label;
-  } else {
-    option.textContent = RUNTIME.isAndroidApp
-      ? `${conf.label}（購入で開放）`
-      : `${conf.label}（アプリで購入）`;
+    return !!ownedSkus?.[conf.sku];
   }
-  return;
-}
 
-  // がんばった日数で開放（いままで通り）
+  // がんばった日数で開放
   return (conf.requiredCount ?? 0) <= perfectCount;
 }
 
@@ -505,11 +500,17 @@ function applyAccessoryFromState() {
   const ribbonEl = document.getElementById("poyo-ribbon");
   if (!ribbonEl) return;
 
-  const conf = ACCESSORY_CONFIG.find(item => item.id === state.accessory);
+  const conf = ACCESSORY_CONFIG_EFFECTIVE.find(item => item.id === state.accessory);
 
   // "なし" など画像がない場合
   if (!conf || !conf.src) {
     ribbonEl.style.display = "none";
+
+    // ブラウザで「課金アクセが保存されていた」場合は、なしに戻す
+    if (!RUNTIME.isAndroidApp && state.accessory !== "none") {
+      state.accessory = "none";
+      saveState();
+    }
     return;
   }
 
@@ -524,7 +525,7 @@ function updateAccessoryOptions() {
 
   const perfect = state.perfectCount || 0;
 
-  ACCESSORY_CONFIG.forEach(conf => {
+  ACCESSORY_CONFIG_EFFECTIVE.forEach(conf => {
     const option = select.querySelector(`option[value="${conf.id}"]`);
     if (!option) return;
 
@@ -556,13 +557,13 @@ function updateAccessoryOptions() {
 
   // もし今選んでいるアクセサリーがロック状態になっていたら、
   // 使えるものの中から先頭のものに戻す
-  const current = ACCESSORY_CONFIG.find(c => c.id === state.accessory);
+  const current = ACCESSORY_CONFIG_EFFECTIVE.find(c => c.id === state.accessory);
   const currentUnlocked = current
     ? isAccessoryUnlocked(current, perfect, state.ownedSkus)
     : false;
 
   if (!current || !currentUnlocked) {
-    const firstUnlocked = ACCESSORY_CONFIG.find(c =>
+    const firstUnlocked = ACCESSORY_CONFIG_EFFECTIVE.find(c =>
       isAccessoryUnlocked(c, perfect, state.ownedSkus)
     );
     if (firstUnlocked) {
@@ -580,7 +581,7 @@ function setupAccessorySelect() {
 
   // 一旦クリアしてアクセサリー一覧から作り直す
   select.innerHTML = "";
-  ACCESSORY_CONFIG.forEach(conf => {
+  ACCESSORY_CONFIG_EFFECTIVE.forEach(conf => {
     const option = document.createElement("option");
     option.value = conf.id;
     select.appendChild(option);
@@ -1133,6 +1134,9 @@ function handleTestPurchase(conf) {
 
 
 function renderPurchaseList() {
+  if (!RUNTIME.isAndroidApp) return;
+  if (!listEl) return;
+
   const paidItems = ACCESSORY_CONFIG.filter(c => c.unlockType === "paid");
   listEl.innerHTML = "";
 
