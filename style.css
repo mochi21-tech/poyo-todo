@@ -1315,6 +1315,7 @@ body.is-fullscreen .fullscreen-btn .header-btn-icon {
   padding: 6px;
   border-radius: 999px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: var(--safe-top);
   margin-bottom: 6px;
   /* 時計とのすき間 */
 }
@@ -1344,6 +1345,6 @@ body.is-fullscreen .fullscreen-btn .header-btn-icon {
 /* スマホ表示：時計の下に配置 */
 @media (max-width: 768px) {
   .template-switch-bar {
-    margin: 0 auto 10px;
+    margin: calc(var(--safe-top) + 0px) auto 10px;
   }
 }
