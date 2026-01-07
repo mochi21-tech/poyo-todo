@@ -66,6 +66,14 @@ const INITIAL_TASKS = [
   ]
 ];
 
+
+// 課金設計メモ
+// - Google Play Billing の商品ID（SKU）は以下の通り
+//   acc_15: クラウン
+//   acc_16: リボン
+//   acc_17: 星
+// - すべて「一度購入したらずっと使える」消耗しないタイプ
+
 /**
  * アクセサリー開放の設定
  * unlockType: "paid" の場合は課金アイテム
@@ -88,9 +96,9 @@ const ACCESSORY_CONFIG = [
   { id: "acc12",  label: "シカ",           requiredCount: 30, src: "asset/asset12.svg" },
   { id: "acc13",  label: "トラ",           requiredCount: 33, src: "asset/asset13.svg" },
   { id: "acc14",  label: "うし",           requiredCount: 36, src: "asset/asset14.svg" },
-  { id: "acc15", label: "クラウン", requiredCount: 0, src: "asset/asset15.svg", unlockType: "paid", sku: "acc_15" },
-  { id: "acc16", label: "リボン",   requiredCount: 0, src: "asset/asset16.svg", unlockType: "paid", sku: "acc_16" },
-  { id: "acc17", label: "星",       requiredCount: 0, src: "asset/asset17.svg", unlockType: "paid", sku: "acc_17" },
+  { id: "acc15", label: "クラウン",  src: "asset/asset15.svg", unlockType: "paid", sku: "acc_15_crown" },
+  { id: "acc16", label: "リボン",    src: "asset/asset16.svg", unlockType: "paid", sku: "acc_16_ribbon" },
+  { id: "acc17", label: "星",        src: "asset/asset17.svg", unlockType: "paid", sku: "acc_17_star" },
 ];
 
 // ブラウザ版では課金アクセを「存在しない扱い」にする
