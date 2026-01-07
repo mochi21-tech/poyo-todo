@@ -56,6 +56,19 @@ body {
   align-items: stretch;
 }
 
+/* ====== ノッチ分下げる ====== */
+:root{
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* 右上ボタン群の親（例：.top-buttons や .header-buttons）に合わせてクラス名を置き換え */
+.top-buttons{
+  top: calc(10px + var(--safe-top));
+  right: calc(10px + var(--safe-right));
+}
+
+
 /* ====== 左（時計+ぽよ+メッセージ） ====== */
 .left-panel {
   display: flex;
@@ -984,6 +997,12 @@ body.guardian-mode.is-android-app .purchase-btn {
 body.is-android-app .fullscreen-btn {
   display: none !important;
 }
+
+/* Andoroidノッチ分さらに下げる */
+body.is-android-app{
+  --safe-top: calc(env(safe-area-inset-top, 0px) + 8px);
+}
+
 /* スマホ表示のとき：helpボタンも丸アイコン化 */
 @media (max-width: 768px) {
 
@@ -1169,8 +1188,8 @@ body.guardian-mode .task-list {
 /* 右上：保護者モード＋全画面ボタンをまとめて配置 */
 .guardian-bar {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: calc(10px + var(--safe-top));
+  right: calc(10px + var(--safe-right));
   display: flex;
   align-items: center;
   gap: 8px;
