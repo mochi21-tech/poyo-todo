@@ -11,6 +11,12 @@
 
   <!-- 保護者モード＋全画面ボタン -->
   <div class="guardian-bar">
+    <!-- 購入ボタン（停止中）
+    <button id="purchase-btn" class="purchase-btn" type="button" aria-hidden="true">
+      <span class="header-btn-icon" aria-hidden="true"></span>
+      <span class="header-btn-label">購入</span>
+    </button>
+    -->
     <button id="help-btn" class="help-btn" type="button">
       <span class="header-btn-icon" aria-hidden="true">?</span>
       <span class="header-btn-label">つかいかた</span>
@@ -227,6 +233,35 @@
       </div>
     </div>
   </div>
+
+  <!-- 購入 モーダル（保護者用）（停止中） 
+  <div id="purchase-overlay" class="help-overlay" aria-hidden="true">
+    <div class="help-dialog">
+      <div class="help-title">購入</div>
+
+      <div class="help-content">
+        <section class="help-section">
+          <h2>購入できるアクセサリー</h2>
+
+          <div id="purchase-list" class="purchase-list"></div>
+
+          <div class="purchase-actions">
+            <button id="purchase-restore" class="purchase-sub-btn" type="button">
+              復元
+            </button>
+            <button id="purchase-close" class="purchase-sub-btn" type="button">
+              閉じる
+            </button>
+          </div>
+
+          <p class="purchase-note">
+            ※ 今は動作確認用です（購入処理はまだつながっていません）
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+  -->
 
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
