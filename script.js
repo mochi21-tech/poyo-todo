@@ -101,10 +101,10 @@ const ACCESSORY_CONFIG = [
   { id: "acc17", label: "星",        src: "asset/asset17.svg", unlockType: "paid", sku: "acc_17_star" },
 ];
 
-// ブラウザ版では課金アクセを「存在しない扱い」にする
-const ACCESSORY_CONFIG_EFFECTIVE = RUNTIME.isAndroidApp
-  ? ACCESSORY_CONFIG
-  : ACCESSORY_CONFIG.filter(c => c.unlockType !== "paid");
+// 課金アクセ（unlockType: "paid"）は Android でも表示しない
+const ACCESSORY_CONFIG_EFFECTIVE = ACCESSORY_CONFIG.filter(
+  (c) => c.unlockType !== "paid"
+);
 
 // ぽよのメッセージ候補
 const POYO_MESSAGES_NORMAL = [
